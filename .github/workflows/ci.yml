@@ -4,6 +4,22 @@ jobs:
   ubuntuBuild:
     runs-on: ubuntu-latest
     steps:
+      
       - uses: actions/checkout@v2
+      
       - uses: haskell/actions/setup@v1
+        id: setup-haskell
+        with:
+          ghc-version: 9.0.1
+          cabal-version: 3.4.0.0
+      
+      - name: Freeze Deps
+        run: cabal freeze
+
+      - uses: actions/cache@v2
+        name: Cache ~/.cabal/store
+        with:
+          path: ${{ steps.setup-haskell.outputs.cabal-store }}
+          key: ${{ runner.os }}-ghc-9.0.1-${{ hashFiles('cabal.project.freeze') }}
+          
       - run: cabal build

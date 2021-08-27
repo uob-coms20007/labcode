@@ -95,7 +95,7 @@ cl m ss =
       where
         -- we only care about those successors that
         -- (a) are reached via an epsilon transition
-        -- (b) we haven't seen in any previous iteration
+        -- (b) we haven't seen in any previous iteration.
         relevant (l,s) =
           l == E && notElem s ss
         newSuccs f =
