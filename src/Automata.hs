@@ -81,7 +81,7 @@ autoTrSys m (q,w) =
 -- the set of states that are reachable from any state in /qs/ by one or 
 -- more epsilon transitions.
 --
--- NOTE: /cl m qs/ will not necessarily contain /qs/.
+-- NOTE: /cl m qs/ will not necessarily contain /qs/. 
 
 cl :: (Ord a, Ord q) => Auto a q -> Set q -> Set q
 cl m ss =
