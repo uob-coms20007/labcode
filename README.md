@@ -50,3 +50,19 @@ However, you can also develop natively in Windows using the [chocolatey](https:/
        C:\tools\ghc-9.01\bin
        C:\tools\msys64
      ```
+
+## Using Gitpod
+
+As a convenience, this repository is configured for use with [Gitpod](https://gitpod.io), which provides you with a fully configured development environment and IDE in the browser. Note that following the instructions below will require you to create a Gitpod account and consume your Gitpod instance time.
+
+Starting the Gitpod instance directly from the main repository will provide you with a working environment, but will not allow you to permanently save any work. In order to make full use of the tool, we recommend that you fork the repository on Github (this requires a github account), then use the following workflow in each of your lab sessions:
+
+  1. Pull changes from the main repository into your fork (the following assumes your username is `user`, so your fork would be `https://github.com/user/labcode`); (using "Fetch upstream" on Github)
+
+  2. Start the Gitpod instance by visiting `https://gitpod.io/#https://github.com/user/labcode` (not a link, since you must replace `user` with the right user, group or org name);
+
+  3. Do your work, committing and pushing as you would using VS Code on your local machine;
+
+  4. Shutdown your instance when you're done.
+
+We cannot promise that no merge conflicts will arise in Step 1: we may have to fiddle with the sample code we provide even after it is released. But we promise to do our best to avoid them.
