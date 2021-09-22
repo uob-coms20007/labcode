@@ -1,18 +1,7 @@
 cabal-version:      2.4
-name:               practicals
+name:               reg
 version:            0.1.0.0
-
--- A short (one-line) description of the package.
--- synopsis:
-
--- A longer description of the package.
--- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-
--- The license under which the package is released.
--- license:
+synopsis:           Code associated with the first two practicals of COMS20007
 author:             Steven Ramsay
 maintainer:         steven.ramsay@bristol.ac.uk
 
@@ -44,4 +33,4 @@ test-suite test
                     tasty ^>= 1.4, 
                     tasty-hunit ^>= 0.10.0.3, 
                     containers >= 0.6.4 && < 0.7,
-                    practicals
+                    reg

@@ -22,4 +22,4 @@ jobs:
           path: ${{ steps.setup-haskell.outputs.cabal-store }}
           key: ${{ runner.os }}-ghc-9.0.1-${{ hashFiles('cabal.project.freeze') }}
           
-      - run: cabal build
+      - run: cabal build all

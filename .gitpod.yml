@@ -2,8 +2,8 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - init: cabal build
-    command: cabal repl
+  - init: cabal build all
+    command: cabal repl reg
 
 vscode:
   extensions:
