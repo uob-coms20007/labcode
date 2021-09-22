@@ -29,6 +29,14 @@ reachable' tr c = reachable tr (Set.singleton c)
 reachable :: Ord a => TrSys a -> Set a -> Set a
 reachable = undefined
 
+-- | Given an ordered type /a/, a transition system /tr/ over /a/ 
+-- and a set of configurations /cs/, /freachable tr cs/ is the set of
+-- of all configurations that are reachable from /cs/ according to /tr/.
+-- Internally maintains a frontier for efficiency.
+
+freachable :: Ord a => TrSys a -> Set a -> Set a
+freachable = undefined
+
 -- | Given a __deterministic__ transition system /tr/ and a configuration /c/, 
 -- /theTrace tr c/ is the (possibly infinite) list of configurations that 
 -- comprise the unique trace of /tr/ starting from /c/.
