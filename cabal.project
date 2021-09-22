@@ -1,0 +1,8 @@
+-- List of subdirectories containing packages
+packages: reg
+
+-- Compile all packages (including dependencies) with docs.
+package *
+  ghc-options: -haddock
+  
+  
