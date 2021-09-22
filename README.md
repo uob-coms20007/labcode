@@ -1,6 +1,11 @@
 # The LabCode Repo
 
-This repository contains the starter code for the practical exercises of the unit *COMS20007: Programming Languages and Computation*.  To get started, we recommend obtaining a clean install of the Haskell toolchain.
+This repository contains the starter code for the practical exercises of the unit *COMS20007: Programming Languages and Computation*.  To get started, there are two options:
+
+  * If you have a laptop on which you can install software, then we recommend you [install the Haskell Toolchain](#install-the-haskell-toolchain).
+  * Otherwise, e.g. if you are using a Bill Brown Suite machine, we recommend you start [using Gitpod](#using-gitpod).
+
+In both cases you will need to use a little bit of the git tool.  If you are not familiar with git, there are lots of resources online, for example from [GitHub](https://guides.github.com/introduction/git-handbook/).
 
 ## Install the Haskell Toolchain
 
