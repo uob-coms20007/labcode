@@ -64,6 +64,6 @@ autoToDot m =
 vizAuto :: (Show a, Show q) => Auto a q -> FilePath -> IO FilePath
 vizAuto a = runGraphviz (autoToDot a) Png
 
-vizTrSys :: (Ord a, Show a) => TrSys a -> Set a -> GraphvizOutput -> FilePath -> IO FilePath
-vizTrSys tr ss = runGraphviz (tsToDot tr ss)
+vizTrSys :: (Ord a, Show a) => TrSys a -> Set a -> FilePath -> IO FilePath
+vizTrSys tr ss = runGraphviz (tsToDot tr ss) Png
 
