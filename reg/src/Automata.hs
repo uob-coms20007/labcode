@@ -6,6 +6,7 @@ import qualified Data.List as List
 
 import TrSys
 
+
 -- | /Label a/ is the type of automaton transition labels, where:
 --   - /E/ represents an epsilon transition
 --   - /S a/ represents a transition on letter /a/
@@ -32,11 +33,11 @@ data Auto a q =
   } deriving (Show)
 
 
--- | Given an automaton /m/ and a state /q/ of /m/, /successors m q/ is
+-- | Given an automaton /m/ and a state /q/ of /m/, /next m q/ is
 -- the set of all pairs /(l, p)/ such that /(q, l, p)/ is a transition of /m/.
 
-successors :: (Ord q, Ord a) => Auto a q -> q -> Set (Label a, q)
-successors m q =
+next :: (Ord q, Ord a) => Auto a q -> q -> Set (Label a, q)
+next m q =
     Set.fromList (map (\(_, a, p) -> (a, p)) relevant)
   where
     relevant = filter (\(p, _, _) -> p == q) (trans m)
@@ -47,11 +48,11 @@ data Parity =
   Odd | Even
   deriving (Show,Eq,Ord)
 
--- | /even/ is an automaton recognising the language of binary strings
+-- | /ev/ is an automaton recognising the language of binary strings
 -- that contain an even number of /1/ characters.
 
-even :: Auto Char Parity
-even =
+ev :: Auto Char Parity
+ev =
   MkAuto {
     start = Even,
     trans = [
@@ -63,60 +64,63 @@ even =
     final = [Even]
   }
 
+-- | /zzo/ is an automaton recognising the language of binary strings 
+-- that contain the substring /"001"/.
+
+zzo :: Auto Char Int
+zzo =
+  MkAuto {
+    start = 0,
+    trans = [
+      (0, S '0', 0),
+      (0, S '1', 0),
+      (0, S '0', 1),
+      (1, S '0', 2),
+      (2, S '1', 3),
+      (3, S '0', 3),
+      (3, S '1', 3)
+    ],
+    final = [3]
+  }
+
+
+-- | A state of the /evzzo/ automaton is either a state of the /ev/ automaton,
+-- or a state of the /zzo/ automaton or the new initial state.
+
+data EvzzoState = Ev Parity | Zzo Int | Init
+  deriving (Eq, Ord)
+
+instance Show EvzzoState where
+  show (Ev p)  = show p
+  show (Zzo n) = show n
+  show Init    = "Init"
+
+-- | /evzzo/ is an automaton recognising the union of the languages of /ev/ and /zzo/.
+
+evzzo :: Auto Char EvzzoState
+evzzo =
+  MkAuto {
+    start = Init,
+    trans =
+      [(Init, E, Ev Even), (Init, E, Zzo 0)]
+        ++ map (\(p,a,q) -> (Ev p,a,Ev q)) (trans ev)
+        ++ map (\(p,a,q) -> (Zzo p,a,Zzo q)) (trans zzo),
+    final = map Ev (final ev) ++ map Zzo (final zzo)
+  }
+
 -- | Given an automaton /m/, /autoTrSys m/ is the associated transition system,
 -- whose configurations are of the form (q, w), where:
 --   - /q/ is a state of /m/
 --   - /w/ is a word over the alphabet of /m/
 
 autoTrSys :: (Ord a, Ord q) => Auto a q -> TrSys (q, [a])
-autoTrSys m (q,w) =
-    Set.union (onSym m (q,w)) (Set.map (\p -> (p,w)) (cl m (Set.singleton q)))
-  where
-    onSym m (_,[])   = Set.empty
-    onSym m (q,b:bs) = Set.map (\p -> (p,bs)) (cl' m bSuccs)
-      where
-        bSuccs = foldr (\(l,p) ps -> if l == S b then Set.insert p ps else ps) Set.empty (successors m q)
-
--- | Given an automaton /m/ and a set of states /qs/ of /m/, /cl m qs/ is 
--- the set of states that are reachable from any state in /qs/ by one or 
--- more epsilon transitions.
---
--- NOTE: /cl m qs/ will not necessarily contain /qs/. 
-
-cl :: (Ord a, Ord q) => Auto a q -> Set q -> Set q
-cl m ss =
-    clWithFr ss Set.empty
-  where
-    clWithFr fs ss =
-      let newFr = oneStep fs ss in
-        if null newFr then ss else clWithFr newFr (Set.union ss newFr)
-    oneStep fs ss =
-        foldr (Set.union . newSuccs) Set.empty fs
-      where
-        -- we only care about those successors that
-        -- (a) are reached via an epsilon transition
-        -- (b) we haven't seen in any previous iteration.
-        relevant (l,s) =
-          l == E && notElem s ss
-        newSuccs f =
-          Set.map snd (Set.filter relevant (successors m f))
-
--- | Given an automaton /m/ and a set of states /qs/, /cl' m qs/ is
--- the set of states reachable from any state in /qs/ by zero or more
--- epsilon transitions.
-
-cl' :: (Ord q, Ord a) => Auto a q -> Set q -> Set q
-cl' m ss = Set.union (cl m ss) ss
+autoTrSys = undefined
 
 -- | Given an automaton /m/ and a word /w/, /member m w/ just if /w/ is 
 -- accepted by /m/.
 
 member :: (Ord a, Ord q) => Auto a q -> [a] -> Bool
-member m a =
-    not (null fs)
-  where
-    ss = reachable (autoTrSys m) (Set.singleton (start m, a))
-    fs = Set.filter (\(q,w) -> q `elem` final m && null w) ss
+member = undefined
 
 -- | Given a __deterministic__ automaton /m/ and a word /w/,
 -- /dfaMember m w/ just if /w/ is accepted by /m/.  

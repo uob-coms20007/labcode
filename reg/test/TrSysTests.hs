@@ -9,7 +9,6 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import TrSys
-import GHC.Base (Alternative(some))
 
 areEqual :: (Eq a, Show a, HasCallStack) => a -> a -> Assertion
 areEqual = assertEqual ""
@@ -21,7 +20,7 @@ trSysTests =
   testGroup "Transition System Tests" [traceTests, rngTraceTests, reachabilityTests]
 
 traceTests =
-  testGroup "Trace Tests" [
+  testGroup "T1: Trace Tests" [
 
     testCase "Traffic light sequence from Red" $
       areEqual
@@ -49,7 +48,7 @@ traceTests =
   ]
 
 rngTraceTests =
-  testGroup "Random Trace Tests" [
+  testGroup "T2: Random Trace Tests" [
 
     testCase "Total chameleon number invariant" $
       isTrue (all (\(r,b,g) -> r + b + g == 9) $ take 10 $ rngTrace 33 chameleons (2,3,4)),
@@ -79,7 +78,7 @@ rngTraceTests =
   ]
 
 reachabilityTests =
-  testGroup "Reachability Tests" [
+  testGroup "T3: Reachability Tests" [
 
     testCase "Traffic from a green light" $
       areEqual
