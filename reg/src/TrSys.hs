@@ -8,6 +8,15 @@ import qualified Data.Set as Set
 import System.Random (StdGen)
 import qualified System.Random as Random
 
+-- The following function definitions will be automatically replaced with 
+-- /undefined/ in the student version of the repository.
+
+-- {-# ANN reachable () #-}
+-- {-# ANN freachable () #-}
+-- {-# ANN rngTrace () #-}
+-- {-# ANN chameleons () #-}
+-- {-# ANN circuit () #-} 
+
 -- | /TrSys a/ is the type of transition systems over configurations of
 -- type /a/.  A value of this type is just a function in /a -> Set a/
 -- which yields the set of successors of any configuration (those configurations
@@ -27,7 +36,18 @@ reachable' tr c = reachable tr (Set.singleton c)
 -- of all configurations that are reachable from /cs/ according to /tr/.
 
 reachable :: Ord a => TrSys a -> Set a -> Set a
-reachable = undefined
+reachable tr cs =
+  reach cs Set.empty
+
+  where
+    reach cs ds =
+      if cs /= ds then
+        reach (cs `Set.union` succs cs) cs
+      else cs
+
+    -- /succs cs/ is the set /{d | there is c in cs and c => d}/
+    succs =
+      Set.unions . Set.map tr
 
 -- | Given an ordered type /a/, a transition system /tr/ over /a/ 
 -- and a set of configurations /cs/, /freachable tr cs/ is the set of
@@ -35,7 +55,31 @@ reachable = undefined
 -- Internally maintains a frontier for efficiency.
 
 freachable :: Ord a => TrSys a -> Set a -> Set a
-freachable = undefined
+freachable tr cs =
+    reach cs cs
+
+  where
+
+    -- Given a set of frontier configurations /fr/ and the set /acc/ of 
+    -- all configurations accumulated so far, /reach fr acc/ is the set 
+    -- of configurations consisting of /acc/ and all those configurations
+    -- reachable from /fr/.
+    reach fr acc =
+      let newFr = oneStep fr acc in
+        if null newFr then
+          acc
+        else
+          reach newFr (foldr Set.insert acc newFr)
+
+    -- Given a set of /frontier/ configurations /fr/ and the set /acc/ of
+    -- all configurations accumulated so far, /oneStep fr acc/ is the set of 
+    -- those configurations not already in /acc/ that can be reached from a 
+    -- configuration in /fr/ in exactly one step.
+    oneStep fr acc =
+        foldr (Set.union . newSuccs) Set.empty fr
+      where
+        newSuccs s =
+          Set.filter (`notElem` acc) (tr s)
 
 -- | Given a __deterministic__ transition system /tr/ and a configuration /c/, 
 -- /theTrace tr c/ is the (possibly infinite) list of configurations that 
@@ -55,7 +99,26 @@ theTrace tr c =
 -- numbers generated from seed /r/.
 
 rngTrace :: Int -> TrSys a -> a -> [a]
-rngTrace = undefined
+rngTrace r tr c =
+    c : List.unfoldr pick (c, gen)
+  where
+    gen = Random.mkStdGen r
+    -- Given a configuration /c/ and the current state of the generator /c/
+    -- /pick (c, g)/ is either: 
+    --   - /Nothing/ if /c/ is a terminal configuration
+    --   - or is of shape /Just (c', (c', g'))/ where:
+    --       - /c'/ is a randomly chosen (according to /g/) successor of /c/
+    --       - /g'/ is the new state of the random number generator
+    pick (c, g) =
+      let cs = tr c in
+      if null cs then
+        Nothing
+      else
+        let
+          (n, g') = Random.uniformR (0, Set.size cs - 1) g
+          c' = Set.elemAt n cs
+        in
+          Just (c', (c', g'))
 
 -- | /chameleons/ is the transition system for the /chameleons problem/.
 -- A configuration of this system is represented by a triple of natural
@@ -68,7 +131,12 @@ rngTrace = undefined
 -- explicitly in the function.
 
 chameleons :: TrSys (Int, Int, Int)
-chameleons = undefined
+chameleons (n,m,p) =
+  Set.fromList (
+    (if n > 0 && m > 0 then [(n-1,m-1,p+2)] else [])
+    ++ (if n > 0 && p > 0 then [(n-1,m+2,p-1)] else [])
+    ++ (if m > 0 && p > 0 then [(n+2,m-1,p-1)] else [])
+  )
 
 -- | /Light/ is the type of UK traffic light configurations.
 
@@ -95,7 +163,11 @@ traffic x = Set.singleton (tfic x)
 -- different from /0/ and /1/.
 
 circuit :: TrSys (Int, Int, Int, Int)
-circuit = undefined
+circuit (0,0,0,_)   = Set.fromList [(0,0,1,0), (1,0,1,0)]
+circuit (0,0,1,_)   = Set.fromList [(0,1,0,0), (1,1,0,0)]
+circuit (0,1,0,_)   = Set.fromList [(0,1,1,0), (1,1,1,0)]
+circuit (_,1,1,_)   = Set.fromList [(0,0,0,1), (1,0,0,1)]
+circuit (1,q1,q0,_) = Set.fromList [(0,0,0,0), (1,0,0,0)]
 
 -- | /prog/ is the transition system for the While program example.
 -- A configuration of this system is a triple of integers /(pc ,x, y)/ with:
