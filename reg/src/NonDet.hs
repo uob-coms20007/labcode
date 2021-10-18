@@ -2,6 +2,8 @@ module NonDet where
 
 import Data.List ( (\\), intersperse )
 
+-- {-# ANN sendMoreMoney () #-}
+
 -- | /guard b/ is /[()]/ if /b/ is /True/ and /[]/ if /b/ is /False/.
 
 guard :: Bool -> [()]
@@ -38,7 +40,24 @@ prop =
 -- | /sendMoreMoney/ is a list of all solutions to the SENDMOREMONEY problem
 
 sendMoreMoney :: [(Int,Int,Int,Int,Int,Int,Int,Int,Int,Int,Int,Int,Int)]
-sendMoreMoney = undefined
+sendMoreMoney =
+  do s <- digits
+     e <- digits \\ [s]
+     n <- digits \\ [s,e]
+     d <- digits \\ [s,e,n]
+     m <- digits \\ [s,e,n,d]
+     o <- digits \\ [s,e,n,d,m]
+     r <- digits \\ [s,e,n,d,m,o]
+     y <- digits \\ [s,e,n,d,m,o,r]
+     guard (y == (d + e) `mod` 10)
+     let c1 = (d + e) `quot` 10
+     guard (e == (n + r + c1) `mod` 10)
+     let c2 = (n + r + c1) `quot` 10
+     guard (n == (e + o + c2) `mod` 10)
+     let c3 = (e + o + c2) `quot` 10
+     guard (o == (s + m + c3) `mod` 10)
+     guard (m == (s + m + c3) `quot` 10)
+     return (s,e,n,d,m,o,r,e,m,o,n,e,y)
 
 -- | /showSoln (s,e,n,d,m,o,r,e,m,o,n,e,y)/ formats a candidate solution to
 -- the SENDMOREMONEY problem nicely as a String.

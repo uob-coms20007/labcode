@@ -6,6 +6,12 @@ import qualified Data.List as List
 
 import TrSys
 
+-- The following functions will have their definitions replaced by 
+-- /undefined/ in the student version.
+
+-- {-# ANN autoTrSys () #-}
+-- {-# ANN member () #-}
+
 
 -- | /Label a/ is the type of automaton transition labels, where:
 --   - /E/ represents an epsilon transition
@@ -114,13 +120,24 @@ evzzo =
 --   - /w/ is a word over the alphabet of /m/
 
 autoTrSys :: (Ord a, Ord q) => Auto a q -> TrSys (q, [a])
-autoTrSys = undefined
+autoTrSys m (q,w) =
+    case w of
+      []   -> eSuccs q w
+      b:bs -> bSuccs q b bs `Set.union` eSuccs q w
+  where
+    eSuccs q bs = foldr (insertIfEqTo E bs) Set.empty (next m q)
+    bSuccs q b bs = foldr (insertIfEqTo (S b) bs) Set.empty (next m q)
+    insertIfEqTo x bs (l,p) cs = if l == x then Set.insert (p,bs) cs else cs
 
 -- | Given an automaton /m/ and a word /w/, /member m w/ just if /w/ is 
 -- accepted by /m/.
 
 member :: (Ord a, Ord q) => Auto a q -> [a] -> Bool
-member = undefined
+member m a =
+    not (null fs)
+  where
+    ss = reachable (autoTrSys m) (Set.singleton (start m, a))
+    fs = Set.filter (\(q,w) -> q `elem` final m && null w) ss
 
 -- | Given a __deterministic__ automaton /m/ and a word /w/,
 -- /dfaMember m w/ just if /w/ is accepted by /m/.  
