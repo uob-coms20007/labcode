@@ -10,6 +10,26 @@ import qualified Data.Set as Set
 import TrSys
 import Automata
 
+-- The following functions will have their definitions replaced by 
+-- /undefined/ in the student version.
+
+-- {-# ANN compileEps () #-}
+-- {-# ANN compileSym () #-}
+-- {-# ANN compileCat () #-}
+-- {-# ANN compileStar () #-}
+-- {-# ANN alts () #-}
+-- {-# ANN exprA () #-}
+-- {-# ANN exprB () #-}
+-- {-# ANN exprC () #-}
+-- {-# ANN exprD () #-}
+-- {-# ANN exprE () #-}
+-- {-# ANN exprUN () #-}
+-- {-# ANN exprTime () #-}
+-- {-# ANN exprIPv4 () #-}
+-- {-# ANN cIdentLex () #-}
+-- {-# ANN intLitLex () #-}
+-- {-# ANN floatLex () #-}
+
 
 -- | /RegExp/ is the type of non-empty regular expressions.
 
@@ -48,36 +68,59 @@ instance Show RegExp where
 -- /alt [c1,c2,...,cn]/ is /c1 `Alt` c2 `Alt` ... `Alt` cn/.
 
 alts :: String -> RegExp
-alts = undefined
+alts (c:cs) = foldr (\c e -> Sym c `Alt` e) (Sym c) cs
 
 exprA :: RegExp
-exprA = undefined
+exprA = (Star "0") `Cat` "1" `Cat` (Star "0")
 exprB :: RegExp
-exprB = undefined
+exprB = (Star sigma) `Cat` "001" `Cat` (Star sigma)
+  where sigma = "0" `Alt` "1"
 exprC :: RegExp
-exprC = undefined
+exprC = Star (sigma `Cat` sigma)
+  where sigma = "0" `Alt` "1"
 exprD :: RegExp
-exprD = undefined
+exprD = ("0" `Alt` Eps) `Cat` (Star "1")
 exprE :: RegExp
-exprE = undefined
+exprE = ("0" `Alt` Eps) `Cat` ("1" `Alt` Eps)
 
 
 -- | /exprUN/ is a regular expression matching Bristol usernames.
 
 exprUN :: RegExp
-exprUN = undefined
+exprUN = alpha `Cat` alpha `Cat` digit `Cat` digit `Cat` digit `Cat` digit `Cat` digit
+  where
+    alpha = alts "abcdefghijklmnopqrstuvwxyz"
+    digit = alts "0123456789"
 
 
 -- | /exprTime/ is a regular expression matching times in HH:MM 24hr format.
 
 exprTime :: RegExp
-exprTime = undefined
+exprTime = hours `Cat` ":" `Cat` mins
+  where
+    hours = (("0" `Alt` "1") `Cat` ds) `Alt` ("2" `Cat` alts "0123")
+    mins = alts "012345" `Cat` ds
+    ds = alts "0123456789"
 
 
 -- | /exprIPv4/ is a regular expression matching IPv4 addresses written in decimal.
 
 exprIPv4 :: RegExp
-exprIPv4 = undefined
+exprIPv4 = octet `dot` octet `dot` octet `dot` octet
+  where
+    dot e1 e2 = e1 `Cat` "." `Cat` e2
+    d4 = alts "01234"
+    d5 = alts "012345"
+    d9 = alts "0123456789"
+    octet =
+      -- 1 or 2 digits
+      d9 `Alt` (d9 `Cat` d9)
+      -- 3 digits
+         `Alt` (
+           (("0" `Alt` "1") `Cat` d9 `Cat` d9)
+             `Alt` ("2" `Cat` ((d4 `Cat` d9)
+             `Alt` ("5" `Cat` d5)))
+         )
 
 
 -- | Given a regular expression /rex/ and a natural number /n/,
@@ -95,10 +138,24 @@ compile (Cat e1 e2) n = compileCat e1 e2 n
 compile (Star e) n    = compileStar e n
 
 compileSym :: Char -> Int -> (Int, Auto Char Int)
-compileSym = undefined
+compileSym c n = (n+2, m)
+  where
+    m =
+      MkAuto {
+        start = n,
+        trans = [(n, S c, n+1)],
+        final = [n+1]
+      }
 
 compileEps :: Int -> (Int, Auto Char Int)
-compileEps = undefined
+compileEps n = (n+2, m)
+  where
+    m =
+      MkAuto {
+        start = n,
+        trans = [(n, E, n+1)],
+        final = [n+1]
+      }
 
 -- | Given regular expressions /e1/ and /e2/ and a number /n/,
 -- /compileAlt e1 e2 n/ is a pair /(n',m)/ where /m/ is an NFA
@@ -147,10 +204,34 @@ compileAlt e1 e2 n0 = (n2+3, m)
       }
 
 compileCat :: RegExp -> RegExp -> Int -> (Int, Auto Char Int)
-compileCat = undefined
+compileCat e1 e2 n0 = (n2, m)
+  where
+    (n1,m1) = compile e1 n0
+    (n2,m2) = compile e2 n1
+    [f1] = final m1
+    m =
+      MkAuto {
+        start = start m1,
+        trans = (f1, E, start m2) : (trans m1 ++ trans m2),
+        final = final m2
+      }
 
 compileStar :: RegExp -> Int -> (Int, Auto Char Int)
-compileStar = undefined
+compileStar e1 n0 = (n1+2, m)
+  where
+    (n1, m1) = compile e1 n0
+    [f1] = final m1
+    newTrans = [
+        (start m1, E, n1+1),
+        (f1, E, n1+1),
+        (n1+1, E, start m1)
+      ]
+    m =
+      MkAuto {
+        start = start m1,
+        trans = newTrans ++ trans m1,
+        final = [n1+1]
+      }
 
 -- | Given a regular expression /rex/ and a string /s/
 -- /match rex s/ is /True/ just if /s/ is a string in
@@ -161,11 +242,27 @@ match rex = member (snd (compile rex 0))
 
 
 cIdentLex :: RegExp
-cIdentLex = undefined
+cIdentLex = (alpha `Alt` "_") `Cat` (Star (alpha `Alt` digits `Alt` "_"))
+  where
+    alpha = alts (['a'..'z'] ++ ['A' .. 'Z'])
+    digits = alts ['0'..'9']
 
 intLitLex :: RegExp
-intLitLex = undefined
+intLitLex =
+    plus digit `Alt` ("0x" `Cat` (plus hexit)) `Alt` ("0b" `Cat` (plus bit))
+  where
+    digit = alts ['0'..'9']
+    hexit = digit `Alt` alts ['a'..'f'] `Alt` alts ['A'..'F']
+    bit   = "0" `Alt` "1"
+    plus e = e `Cat` Star e
 
 floatLex :: RegExp
-floatLex = undefined
+floatLex =
+    (decimal `Cat` "." `Cat` decimal `Cat` (exponent `Alt` Eps))
+      `Alt` (decimal `Cat` exponent)
+  where
+    digit = alts ['0'..'9']
+    decimal = plus digit
+    exponent = ("e" `Alt` "E") `Cat` ("+" `Alt` "-" `Alt` Eps) `Cat` decimal
+    plus e = e `Cat` Star e
 
