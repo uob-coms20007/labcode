@@ -10,9 +10,27 @@ maintainer:         f.dupressoir@bristol.ac.uk
 -- category:
 extra-source-files:
 
+executable while
+  -- exposed-modules:
+  build-tools:        alex, happy
+  other-modules:      WhileAST
+                      Lexer, Parser
+                      LexerExt, ParserExt
+  build-depends:      base, array, containers
+  ghc-options:        -Wall
+                      -Wcompat
+                      -Wincomplete-record-updates
+                      -Wincomplete-uni-patterns
+                      -Wredundant-constraints
+                      -main-is While
+  hs-source-dirs:     src
+  main-is:            While.hs
+  default-language:   Haskell2010
+
 library
 
   exposed-modules:     While, WhileAST, WhilePG, Parser, Lexer
+                       LexerExt, ParserExt
   build-tools:         alex
   other-extensions:    OverloadedStrings
   build-depends:       base         >=4.14.0.0 && < 4.16.0.0,

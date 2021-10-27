@@ -1,7 +1,11 @@
 module While where
 
+import System.Environment
+import System.Exit(exitSuccess, exitWith, ExitCode(ExitFailure))
+
 import Data.Map as Map
 import WhileAST
+import qualified Parser(parse)
 
 type State = Map Var Integer
 
@@ -9,14 +13,14 @@ type State = Map Var Integer
 asem :: AExpr -> State -> Integer
 asem (EInt n) _     = n
 asem (EVar x) s     = Map.findWithDefault 0 x s
-asem (EAdd a1 a2) s = (asem a1 s) + (asem a2 s)
-asem (EMul a1 a2) s = (asem a1 s) * (asem a2 s)
-asem (ESub a1 a2) s = (asem a1 s) - (asem a2 s)
+asem (EBinOp AAdd a1 a2) s = (asem a1 s) + (asem a2 s)
+asem (EBinOp AMul a1 a2) s = (asem a1 s) * (asem a2 s)
+asem (EBinOp ASub a1 a2) s = (asem a1 s) - (asem a2 s)
 
 bsem :: BExpr -> State -> Bool
 bsem (BBool b) _    = b
-bsem (BEq a1 a2) s  = asem a1 s == asem a2 s
-bsem (BLe a1 a2) s  = asem a1 s <= asem a2 s
+bsem (BComp AEq a1 a2) s  = asem a1 s == asem a2 s
+bsem (BComp ALe a1 a2) s  = asem a1 s <= asem a2 s
 bsem (BNot b) s     = not $ bsem b s
 bsem (BAnd b1 b2) s = bsem b1 s && bsem b2 s
 
@@ -41,4 +45,31 @@ sos c s =
   case step c s of
     Left (c', s') -> sos c' s'
     Right s'      -> s'
+
+main :: IO ()
+main = do
+  a <- getArgs
+  s <- parse a
+  t <- case Parser.parse s of
+         Right t  -> return t
+         Left err -> putStrLn ("Parse error: " ++ err) >> die 2
+  putStr (show $ sos t Map.empty)
+
+parse :: [String] -> IO String
+parse ["-h"] = usage   >> exit
+parse ["-v"] = version >> exit
+parse [f]    = readFile f
+parse _      = usage   >> die 1
+
+usage :: IO ()
+usage   = putStrLn "Usage: while [-vh] [file]"
+
+version :: IO ()
+version = putStrLn "Haskell while 0.1"
+
+exit :: IO a
+exit    = exitSuccess
+
+die :: Int -> IO a
+die i   = exitWith (ExitFailure i)
 
