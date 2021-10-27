@@ -1,5 +1,5 @@
 -- List of subdirectories containing packages
-packages: reg
+packages: reg while
 
 -- Compile all packages (including dependencies) with docs.
 package *
