@@ -9,6 +9,9 @@ paren False s = s
 
 -- The types defining our Abstract Syntax Trees for the While language
 
+data ABinOp = AAdd | ASub | AMul
+  deriving (Show, Eq)
+
 -- | /AExpr/ defines arithmetic expressions:
 data AExpr =
   -- Variables are arithmetic expressions
@@ -16,20 +19,27 @@ data AExpr =
   -- Integer literals (in ZZ) are arithmetic expressions
   | EInt Integer
   -- Two expressions can be combined into a third using +, - or *
-  | EAdd AExpr AExpr
-  | ESub AExpr AExpr
-  | EMul AExpr AExpr
+  | EBinOp ABinOp AExpr AExpr
   deriving (Show, Eq)
 
 -- A pretty printer for arithmetic expressions
+ppABinOp :: ABinOp -> String
+ppABinOp AAdd = " + "
+ppABinOp ASub = " - "
+ppABinOp AMul = " * "
+
 ppAexpr :: AExpr -> String
 ppAexpr = aux False
   where
-    aux _ (EInt n)     = show n
-    aux _ (EVar v)     = v
-    aux f (EAdd a1 a2) = paren f $ aux False a1 ++ " + " ++ aux False a2
-    aux f (ESub a1 a2) = paren f $ aux False a1 ++ " - " ++ aux True a2
-    aux _ (EMul a1 a2) = aux True a1 ++ " * " ++ aux True a2
+    aux _ (EInt n)             = show n
+    aux _ (EVar v)             = v
+    aux f (EBinOp o a1 a2)
+      | o == AAdd || o == ASub = paren f $ aux False a1 ++ ppABinOp o ++ aux False a2
+      | o == AMul              = aux True a1 ++ " * " ++ aux True a2
+      | otherwise              = undefined
+
+data ACompOp = AEq | ALe
+  deriving (Show, Eq)
 
 -- | /BExpr/ defines boolean expressions:
 data BExpr =
@@ -40,19 +50,21 @@ data BExpr =
   -- The conjunction of two boolean expressions is a boolean expression
   | BAnd BExpr BExpr
   -- The comparison of two arithmetic expressions is a boolean expression (using = or ≤)
-  | BEq AExpr AExpr
-  | BLe AExpr AExpr
+  | BComp ACompOp AExpr AExpr
   deriving (Show, Eq)
 
 -- A pretty printer for boolean expressions
+ppACompOp :: ACompOp -> String
+ppACompOp AEq = " = "
+ppACompOp ALe = " <= "
+
 ppBExpr :: BExpr -> String
 ppBExpr = aux False
   where
-    aux _ (BBool b)    = show b
-    aux _ (BEq a1 a2)  = show a1 ++ " = " ++ show a2
-    aux _ (BLe a1 a2)  = show a1 ++ " <= " ++ show a2
-    aux _ (BNot b)     = "!" ++ aux True b
-    aux f (BAnd b1 b2) = paren f $ aux False b1 ++ " && " ++ aux False b2
+    aux _ (BBool b)       = show b
+    aux _ (BComp o a1 a2) = show a1 ++ ppACompOp o ++ show a2
+    aux _ (BNot b)        = "!" ++ aux True b
+    aux f (BAnd b1 b2)    = paren f $ aux False b1 ++ " && " ++ aux False b2
 
 -- | /Stmt/ defines statements:
 data Stmt =
