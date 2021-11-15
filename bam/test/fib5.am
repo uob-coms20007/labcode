@@ -1,0 +1,39 @@
+PUSH 5;
+STORE n;
+PUSH 0;
+STORE fib1;
+PUSH 1;
+STORE fib2;
+PUSH 0;
+LOAD n;
+LE;
+IF(
+  PUSH 0;
+  STORE result;
+ ,PUSH 1;
+  LOAD n;
+  EQ;
+  IF(
+    PUSH 1;
+    STORE result;
+   ,PUSH 2;
+    STORE i;
+    LOOP(
+      LOAD n;
+      LOAD i;
+      LE;
+     ,LOAD fib1;
+      LOAD fib2;
+      ADD;
+      LOAD fib2;
+      STORE fib1;
+      STORE fib2;
+      LOAD i;
+      PUSH 1;
+      ADD;
+      STORE i;
+    );
+    LOAD fib2;
+    STORE result;
+  );
+);

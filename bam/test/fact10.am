@@ -1,0 +1,15 @@
+PUSH 1;
+STORE r;
+LOOP(
+  PUSH 0;
+  LOAD x;
+  LE;
+  NOT;,
+  LOAD r;
+  LOAD x;
+  MUL;
+  STORE r;
+  PUSH 1;
+  LOAD x;
+  SUB;
+  STORE x;);
