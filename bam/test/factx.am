@@ -1,0 +1,22 @@
+PUSH 0;
+LOAD x;
+LE;
+PUSH 1;
+STORE result;
+IF(
+  NOOP;
+ ,LOOP(
+    PUSH 1;
+    LOAD x;
+    LE;
+    NOT;,
+    LOAD result;
+    LOAD x;
+    MUL;
+    STORE result;
+    PUSH 1;
+    LOAD x;
+    SUB;
+    STORE x;
+  );
+);
