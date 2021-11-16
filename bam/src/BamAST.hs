@@ -1,7 +1,5 @@
-module Instr (Const(..), Instr(..),
+module BamAST (Const(..), Instr(..),
               Code, showCode, showFlatCode) where
-
-import Var
 
 data Const =
     CNum  Integer
@@ -14,9 +12,9 @@ instance Show Const
 
 data Instr =
     IPush Const
-  | IAdd | IMul | ISub
-  | INot | IAnd | IEq   | ILe
-  | IFetch Var  | IStore Var
+  | IAdd | IMul   | ISub
+  | INot | IAnd   | IEq   | ILe
+  | IFetch String | IStore String
   | IBranch Code Code
   | ILoop   Code Code
   | INoop
@@ -36,13 +34,13 @@ newline True  acc = '\n' : acc
 
 pp :: Bool -> Int -> Instr -> String
 pp f d (IPush n    ) = indent f d $ "PUSH " ++ show n
-pp f d (INot       ) = indent f d $ "NOT"
-pp f d (IAdd       ) = indent f d $ "ADD"
-pp f d (IMul       ) = indent f d $ "MUL"
-pp f d (ISub       ) = indent f d $ "SUB"
-pp f d (IAnd       ) = indent f d $ "AND"
-pp f d (IEq        ) = indent f d $ "EQ"
-pp f d (ILe        ) = indent f d $ "LE"
+pp f d  INot         = indent f d   "NOT"
+pp f d  IAdd         = indent f d   "ADD"
+pp f d  IMul         = indent f d   "MUL"
+pp f d  ISub         = indent f d   "SUB"
+pp f d  IAnd         = indent f d   "AND"
+pp f d  IEq          = indent f d   "EQ"
+pp f d  ILe          = indent f d   "LE"
 pp f d (IFetch x   ) = indent f d $ "LOAD " ++ x
 pp f d (IStore x   ) = indent f d $ "STORE " ++ x
 pp f d (IBranch t e) = indent f d $ "IF("
@@ -55,7 +53,7 @@ pp f d (ILoop c b  ) = indent f d $ "LOOP("
                      ++ indent f (d + 1) ","
                      ++ (newline f $ showCode f (d + 1) b)
                      ++ ")"
-pp f d (INoop      ) = indent f d $ "NOOP"
+pp f d  INoop        = indent f d   "NOOP"
 
 showCode :: Bool -> Int -> Code -> String
 showCode _ _ []    = []

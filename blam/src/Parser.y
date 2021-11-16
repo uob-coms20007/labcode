@@ -2,7 +2,7 @@
 module Parser (parse) where
 
 import Lexer
-import BamAST
+import BlamAST
 }
 
 %name parseC Code
@@ -24,12 +24,9 @@ NOT    { MkToken _  TNot         }
 AND    { MkToken _  TAnd         }
 LOAD   { MkToken _  TFetch       }
 STORE  { MkToken _  TStore       }
-IF     { MkToken _  TBranch      }
-LOOP   { MkToken _  TLoop        }
+GOTO   { MkToken _  TGoto        }
+GOTOF  { MkToken _  TGotoF       }
 NOOP   { MkToken _  TNoop        }
-'('    { MkToken _  TLParen      }
-')'    { MkToken _  TRParen      }
-','    { MkToken _  TComma       }
 ';'    { MkToken _  TSemiC       }
 
 %%
@@ -62,13 +59,13 @@ Op
   | AND { IAnd }
 
 Mem
-  : LOAD VAR { IFetch (tkVar $2) }
+  : LOAD VAR  { IFetch (tkVar $2) }
   | STORE VAR { IStore (tkVar $2) }
 
 Flow
-  : IF '(' Code ',' Code ')'     { IBranch $3 $5 }
-  | LOOP   '(' Code ',' Code ')' { ILoop   $3 $5 }
-  | NOOP                         { INoop         }
+  : GOTO  NUM  { IGoto  (fromIntegral $ tkNum $2) }
+  | GOTOF NUM  { IGotoF (fromIntegral $ tkNum $2) }
+  | NOOP       { INoop                            }
 
 {
 -- How to handle errors; Hint: we don't. Hint2: we should.
