@@ -3,18 +3,20 @@ module Main where
 import System.IO (isEOF)
 
 import Parser
-import Bam
+import Blam
 
 run :: String -> IO ()
 run inp = do
---  hPutStrLn stderr $ "Parsing string\n" ++ inp ++ "\n"
   let c = parse inp
---  hPutStr stderr $ show c
-  case exec c of
+  let (rtr, r) = exec c
+  let tr = unlines (map ((\xs -> '⇒' : ' ' : xs) . showConfig) (reverse rtr))
+  case r of
     Left m       -> do
       putStrLn m
+      putStrLn $ "Trace: " ++ tr
     Right (_, s) -> do
       putStrLn $ "Final Store: " ++ show s
+      putStrLn $ "Trace: " ++ tr
 
 loop :: String -> IO ()
 loop inp = do

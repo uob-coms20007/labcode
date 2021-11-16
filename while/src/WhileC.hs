@@ -4,7 +4,7 @@ import System.Environment
 import System.Exit(exitSuccess, exitWith, ExitCode(ExitFailure))
 
 import WhileAST
-import Instr
+import BamAST
 import qualified Parser(parse)
 
 aritToInstrs :: AExpr -> Code -> Code

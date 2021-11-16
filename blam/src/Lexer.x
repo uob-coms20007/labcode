@@ -21,12 +21,9 @@ tokens :-
   AND    | and                  { \p _ -> MkToken p $ TAnd           }
   LOAD   | load                 { \p _ -> MkToken p $ TFetch         }
   STORE  | store                { \p _ -> MkToken p $ TStore         }
-  IF     | if                   { \p _ -> MkToken p $ TBranch        }
-  LOOP   | loop                 { \p _ -> MkToken p $ TLoop          }
+  GOTO   | goto                 { \p _ -> MkToken p $ TGoto          }
+  GOTOF  | gotof                { \p _ -> MkToken p $ TGotoF         }
   NOOP   | noop                 { \p _ -> MkToken p $ TNoop          }
-  \(                            { \p _ -> MkToken p $ TLParen        }
-  \)                            { \p _ -> MkToken p $ TRParen        }
-  \,                            { \p _ -> MkToken p $ TComma         }
   \;                            { \p _ -> MkToken p $ TSemiC         }
   a-z [a-z A-Z 0-9 \_ \']*      { \p s -> MkToken p $ TVar $ s       }
   \-? [0-9]+                    { \p n -> MkToken p $ TNum $ read n  }
@@ -37,8 +34,8 @@ data Token =
   | TPush       | TAdd         | TMul   | TSub
   | TEq         | TLe          | TNot   | TAnd
   | TFetch      | TStore
-  | TBranch     | TLoop        | TNoop
-  | TLParen     | TRParen      | TComma | TSemiC
+  | TGoto       | TGotoF       | TNoop
+  | TSemiC
 
 instance Show Token where
   show (TVar v)  = v
@@ -54,12 +51,9 @@ instance Show Token where
   show TAnd      = "AND"
   show TFetch    = "LOAD"
   show TStore    = "STORE"
-  show TBranch   = "IF"
-  show TLoop     = "LOOP"
+  show TGoto     = "GOTO"
+  show TGotoF    = "GOTOF"
   show TNoop     = "NOOP"
-  show TLParen   = "("
-  show TRParen   = ")"
-  show TComma    = ","
   show TSemiC    = ";"
 
 data PToken = MkToken AlexPosn Token

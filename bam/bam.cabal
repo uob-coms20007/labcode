@@ -11,11 +11,30 @@ build-type:          Simple
 -- category:
 extra-source-files:
 
+executable bamc
+  -- exposed-modules:
+  build-tools:        alex, happy
+  other-modules:      BamAST
+                      Lexer, Parser
+  build-depends:      base         >=4.14.0.0 && < 4.17.0.0,
+                      array,
+                      containers   >= 0.6.4 && < 0.7,
+                      blam
+  ghc-options:        -Wall
+                      -Wcompat
+                      -Wincomplete-record-updates
+                      -Wincomplete-uni-patterns
+                      -Wredundant-constraints
+                      -main-is BamC
+  hs-source-dirs:     src
+  main-is:            BamC.hs
+  default-language:   Haskell2010
+
 executable bam
   -- exposed-modules:
   build-tools:        alex, happy
-  other-modules:      Var, Instr
-                      State, Bam
+  other-modules:      BamAST
+                      Bam
                       Lexer, Parser
   build-depends:      base         >=4.14.0.0 && < 4.17.0.0,
                       array,
@@ -31,8 +50,8 @@ executable bam
 
 library
 
-  exposed-modules:    Instr, Bam
-  other-modules:      Var, State, Lexer, Parser
+  exposed-modules:    BamAST, Bam
+  other-modules:      Lexer, Parser
   build-tools:        alex, happy
   build-depends:      base         >=4.14.0.0 && < 4.17.0.0,
                       array,

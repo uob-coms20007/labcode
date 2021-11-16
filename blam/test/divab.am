@@ -1,0 +1,18 @@
+PUSH 0;
+STORE q;
+LOAD a;
+LOAD b;
+LE;
+GOTOF 19;
+PUSH 1;
+LOAD q;
+ADD;
+STORE q;
+LOAD b;
+LOAD a;
+SUB;
+STORE a;
+GOTO 6;
+LOAD a;
+STORE r;
+

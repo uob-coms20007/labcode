@@ -1,7 +1,15 @@
 module Bam (exec) where
 
-import Instr
-import State
+import qualified Data.Map as M
+import BamAST
+
+type State = M.Map String Integer
+
+zget :: State -> String -> Integer
+zget s x = M.findWithDefault 0 x s
+
+set :: State -> String -> Integer -> State
+set s x v = M.insert x v s
 
 -- The abstract machine
 data Val = VInt Integer | VBool Bool
@@ -24,13 +32,13 @@ evalOp INot (VBool b : e)             = VBool (not b) : e
 evalOp IAnd (VBool b1 : VBool b2 : e) = VBool (b1 && b2) : e
 evalOp IEq  (VInt n1  : VInt n2  : e) = VBool (n1 == n2) : e
 evalOp ILe  (VInt n1  : VInt n2  : e) = VBool (n1 <= n2) : e
-evalOp _    _             = undefined
+evalOp _    _                         = undefined
 
 -- Big step
 backtrace :: Config -> Either String (Stack, State) -> Either String (Stack, State)
 backtrace co (Left m) = Left $ m ++ "\n→ Reached from: " ++ showConfig co
 backtrace _  r        = r
---
+
 execC :: Config -> Either String (Stack, State)
 execC ([], e, s)                              = Right (e, s)
 execC ([INoop], e, s)                         = Right (e, s)
@@ -69,6 +77,6 @@ execC co@(i : c, e, s)                        =
     Right (e1, s1) -> backtrace co $ execC (c, e1, s1)
     r              -> r
 
-exec :: Code -> State -> Either String (Stack, State)
-exec c s = execC (c, [], s)
+exec :: Code -> Either String (Stack, State)
+exec c = execC (c, [], M.empty)
 
