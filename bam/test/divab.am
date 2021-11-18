@@ -1,16 +1,16 @@
 PUSH 0;
 STORE q;
 LOOP(
-  LOAD a;
   LOAD b;
+  LOAD a;
   LE;
   ,
-  PUSH 1;
   LOAD q;
+  PUSH 1;
   ADD;
   STORE q;
-  LOAD b;
   LOAD a;
+  LOAD b;
   SUB;
   STORE a;
 );

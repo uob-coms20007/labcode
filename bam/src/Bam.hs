@@ -25,13 +25,13 @@ showConfig :: Config -> String
 showConfig (c, e, s) = "(" ++ showFlatCode c ++ "," ++ show e ++ "," ++ show s ++ ")"
 
 evalOp :: Instr -> [Val] -> [Val]
-evalOp IAdd (VInt n1  : VInt n2  : e) = VInt  (n1 +  n2) : e
-evalOp IMul (VInt n1  : VInt n2  : e) = VInt  (n1 *  n2) : e
-evalOp ISub (VInt n1  : VInt n2  : e) = VInt  (n1 -  n2) : e
+evalOp IAdd (VInt n2  : VInt n1  : e) = VInt  (n1 +  n2) : e
+evalOp IMul (VInt n2  : VInt n1  : e) = VInt  (n1 *  n2) : e
+evalOp ISub (VInt n2  : VInt n1  : e) = VInt  (n1 -  n2) : e
 evalOp INot (VBool b : e)             = VBool (not b) : e
-evalOp IAnd (VBool b1 : VBool b2 : e) = VBool (b1 && b2) : e
-evalOp IEq  (VInt n1  : VInt n2  : e) = VBool (n1 == n2) : e
-evalOp ILe  (VInt n1  : VInt n2  : e) = VBool (n1 <= n2) : e
+evalOp IAnd (VBool b2 : VBool b1 : e) = VBool (b1 && b2) : e
+evalOp IEq  (VInt n2  : VInt n1  : e) = VBool (n1 == n2) : e
+evalOp ILe  (VInt n2  : VInt n1  : e) = VBool (n1 <= n2) : e
 evalOp _    _                         = undefined
 
 -- Big step

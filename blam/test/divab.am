@@ -1,15 +1,15 @@
 PUSH 0;
 STORE q;
-LOAD a;
 LOAD b;
+LOAD a;
 LE;
 GOTOF 19;
-PUSH 1;
 LOAD q;
+PUSH 1;
 ADD;
 STORE q;
-LOAD b;
 LOAD a;
+LOAD b;
 SUB;
 STORE a;
 GOTO 6;

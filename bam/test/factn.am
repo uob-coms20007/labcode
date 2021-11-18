@@ -1,5 +1,3 @@
-PUSH 10;
-STORE n;
 PUSH 1;
 STORE r;
 LOOP(

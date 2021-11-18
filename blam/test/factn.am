@@ -1,0 +1,16 @@
+PUSH 1;
+STORE r;
+PUSH 1;
+LOAD n;
+LE;
+GOTOF 17;
+LOAD r;
+LOAD n;
+MUL;
+STORE r;
+LOAD n;
+PUSH 1;
+SUB;
+STORE n;
+GOTO 4;
+
