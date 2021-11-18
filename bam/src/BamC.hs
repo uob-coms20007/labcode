@@ -13,7 +13,7 @@ lower = undefined
 compile :: H.Code -> L.Code
 compile s = snd $ lower 0 s
 
--- Reads the file named on the command line, then parse and compile it
+-- Reads the input off of stdin
 -- Output is to stdout, redirect it to save
 main :: IO ()
 main = do
