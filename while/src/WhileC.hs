@@ -8,16 +8,32 @@ import BamAST
 import qualified Parser(parse)
 
 aritToInstrs :: AExpr -> Code -> Code
-aritToInstrs = undefined
+aritToInstrs (EInt n)     acc = IPush  (CNum n) : acc
+aritToInstrs (EVar x)     acc = IFetch x : acc
+aritToInstrs (EBinOp o a1 a2) acc = aritToInstrs a1 $ aritToInstrs a2 $ opToInstr o : acc
+  where
+    opToInstr AAdd = IAdd
+    opToInstr ASub = ISub
+    opToInstr AMul = IMul
 
 boolToInstrs :: BExpr -> Code -> Code
-boolToInstrs = undefined
+boolToInstrs (BBool b)       acc = IPush (CBool b)  : acc
+boolToInstrs (BComp o a1 a2) acc = aritToInstrs a1 $ aritToInstrs a2 $ opToInstr o  : acc
+  where
+    opToInstr AEq = IEq
+    opToInstr ALe = ILe
+boolToInstrs (BNot b)        acc = boolToInstrs b (INot : acc)
+boolToInstrs (BAnd b1 b2)    acc = boolToInstrs b1 $ boolToInstrs b2 $ IAnd : acc
 
 boolToCode :: BExpr -> Code
 boolToCode b = boolToInstrs b []
 
 stmtToInstrs :: Stmt -> Code -> Code
-stmtToInstrs = undefined
+stmtToInstrs  SSkip         acc = acc
+stmtToInstrs (SWhile b s)   acc = ILoop (boolToCode b) (compile s) : acc
+stmtToInstrs (SAssign x a)  acc = aritToInstrs a  $ IStore x : acc
+stmtToInstrs (SSeq s1 s2)   acc = stmtToInstrs s1 $ stmtToInstrs s2 acc
+stmtToInstrs (SIte b se st) acc = boolToInstrs b  $ IBranch (compile se) (compile st) : acc
 
 compile :: Stmt -> Code
 compile s = stmtToInstrs s []
