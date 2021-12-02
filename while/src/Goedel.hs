@@ -1,4 +1,4 @@
-module While where
+module Goedel where
 
 import WhileAST
 import Parser (parse)
